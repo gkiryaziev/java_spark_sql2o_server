@@ -15,13 +15,19 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Sql2o sql2o = new Sql2o("jdbc:mysql://192.168.2.11:3306/db_school", "admin", "admin");
+		String dbHost = Optional.ofNullable(System.getenv("OPENSHIFT_MYSQL_DB_HOST")).orElse("0.0.0.0");
+		String dbPort = Optional.ofNullable(System.getenv("OPENSHIFT_MYSQL_DB_PORT")).orElse("3306");
+		String dbUser = Optional.ofNullable(System.getenv("OPENSHIFT_MYSQL_DB_USERNAME")).orElse("admin");
+		String dbPass = Optional.ofNullable(System.getenv("OPENSHIFT_MYSQL_DB_PASSWORD")).orElse("admin");
+		String dbName = "db_school";
+		
+	    Sql2o sql2o = new Sql2o("jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName, dbUser, dbPass);
+		
+        String host = Optional.ofNullable(System.getenv("OPENSHIFT_DIY_IP")).orElse("0.0.0.0");
+        int port = Integer.parseInt(Optional.ofNullable(System.getenv("OPENSHIFT_DIY_PORT")).orElse("8080"));
 
-        String ipAddress = Optional.ofNullable(System.getenv("OPENSHIFT_DIY_IP")).orElse("0.0.0.0");
-        int ipPort = Integer.parseInt(Optional.ofNullable(System.getenv("OPENSHIFT_DIY_PORT")).orElse("8008"));
-
-        ipAddress(ipAddress);
-        port(ipPort);
+        ipAddress(host);
+        port(port);
 
         new StudentController(new StudentService(sql2o));
         new SchoolClassController(new SchoolClassService(sql2o));
